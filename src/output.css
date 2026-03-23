@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --animate-line-slide: line-slide 0.8s ease-out forwards;
+}
+
+/* Line Slide Animation */
+@keyframes line-slide {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Custom Line Style */
+.zsc-line {
+  transform-origin: right;
+  animation: var(--animate-line-slide);
+}

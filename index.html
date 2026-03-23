@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZERO-Day-Dashboard</title>
+
+    <!-- ✅ Local CSS only - NO CDN -->
+    <link rel="stylesheet" href="styel.css">
+    <link rel="stylesheet" href="./dist/output.css">
+    <script defer src="script.js"></script>
+
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes load-line {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        .card-load-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #E30613;
+            transform-origin: left;
+            animation: load-line 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: inherit;
+        }
+        #cursor-glow {
+            position: fixed;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(227, 6, 19, 0.05) 0%, rgba(227, 6, 19, 0) 55%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+        }
+        /* Professional Quote Style */
+        .quote-box {
+            position: relative;
+            padding: 12px 20px;
+            background: linear-gradient(to right, rgba(227, 6, 19, 0.04), transparent);
+            border-left: 4px solid #E30613;
+            border-radius: 0 12px 12px 0;
+            margin-top: 24px;
+            font-style: italic;
+            transition: all 0.3s ease;
+            max-width: fit-content;
+        }
+        .quote-box:hover {
+            background: rgba(227, 6, 19, 0.08);
+            transform: translateX(5px);
+        }
+        html[dir="rtl"] .quote-box {
+            padding: 12px 20px;
+            background: linear-gradient(to left, rgba(227, 6, 19, 0.04), transparent);
+            border-left: none;
+            border-right: 4px solid #E30613;
+            border-radius: 12px 0 0 12px;
+        }
+        html[dir="rtl"] .quote-box:hover {
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body class="overflow-hidden flex flex-col relative w-full">
+
+    <!-- CURSOR GLOW (Hidden on mobile) -->
+    <div id="cursor-glow" class="hidden md:block"></div>
+
+    <!-- OVERLAY للموبايل -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+
+    <!-- هيدر الموبايل -->
+    <header class="md:hidden bg-secondary border-b border-custom p-4 flex justify-between items-center z-30 shadow-md shrink-0">
+        <div class="flex items-center gap-3">
+            <h2 class="text-xl font-bold tracking-wider">ZERO <span class="text-[#E30613]">Day</span></h2>
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- Theme Toggle Mobile -->
+            <div class="theme-toggle" onclick="toggleTheme()" id="themeToggleMobile">
+                <div class="theme-toggle-slider" id="themeSliderMobile">🌙</div>
+            </div>
+            <!-- Language Toggle Mobile -->
+            <div class="lang-toggle" onclick="toggleLanguage()" id="langToggleMobile">
+                <div class="lang-toggle-slider" id="langSliderMobile">ع</div>
+            </div>
+            <button onclick="toggleSidebar()" class="text-primary hover:text-[#E30613] transition focus:outline-none p-1">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative w-full">
+        <aside id="sidebar" class="fixed md:static inset-y-0 right-0 z-50 w-64 bg-secondary h-full p-6 border-l border-custom shadow-2xl transform translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col shrink-0">
+            <div class="mb-6 flex justify-between items-start shrink-0">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-wider">ZERO <span class="text-[#E30613]">DAY</span></h2>
+                    <div class="mt-2 space-y-1">
+                        <div class="h-1 w-[68px] bg-[#E30613] zsc-line"></div>
+                        <div class="h-1 w-[45px] bg-[#E30613] zsc-line"></div>
+                    </div>
+                </div>
+                <!-- زر القفل في الموبايل -->
+                <button onclick="toggleSidebar()" class="md:hidden text-tertiary hover:text-[#E30613] transition p-1">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Toggles Desktop -->
+            <div class="mb-4 hidden md:flex gap-2">
+                <div class="theme-toggle" onclick="toggleTheme()" id="themeToggleDesktop">
+                    <div class="theme-toggle-slider" id="themeSliderDesktop">🌙</div>
+                </div>
+                <div class="lang-toggle" onclick="toggleLanguage()" id="langToggleDesktop">
+                    <div class="lang-toggle-slider" id="langSliderDesktop">ع</div>
+                </div>
+            </div>
+
+            <nav class="space-y-2 flex-1 overflow-y-auto pr-1 pb-24 md:pb-0">
+                <div id="navHome" onclick="showPage('home')" class="bg-[#E30613]/10 text-[#E30613] p-3 rounded-xl font-bold cursor-pointer">
+                    <span data-ar="الرئيسية" data-en="Home">الرئيسية</span>
+                </div>
+                <hr class="border-t border-[#E30613]/20 my-4 shadow-[0_0_10px_rgba(227,6,19,0.1)]">
+                <div id="navDiary" onclick="showPage('diary')" class="text-secondary hover:text-primary p-3 rounded-xl transition cursor-pointer">
+                    <span data-ar="اليوميات" data-en="Daily Log">اليوميات</span>
+                </div>
+                <div id="navAthkar" onclick="showPage('athkar')" class="text-secondary hover:text-primary p-3 rounded-xl transition cursor-pointer ">
+                    <span data-ar="الأذكار والورد اليومي" data-en="Daily Athkar">الأذكار والورد اليومي</span>
+                </div>
+                <div id="navSubjects" onclick="showPage('subjects')" class="text-secondary hover:text-primary p-3 rounded-xl transition cursor-pointer">
+                    <span data-ar="مواد الكلية" data-en="Subjects">مواد الكلية</span>
+                </div>
+                <div id="navSchedule" onclick="showPage('schedule')" class="text-secondary hover:text-primary p-3 rounded-xl transition cursor-pointer">
+                    <span data-ar="الجدول الدراسي" data-en="Schedule">الجدول الدراسي</span>
+                </div>
+                <div id="navCourses" onclick="showPage('courses')" class="text-secondary hover:text-primary p-3 rounded-xl transition cursor-pointer">
+                    <span data-ar="تتبع الكورسات" data-en="Courses">تتبع الكورسات</span>
+                </div>
+                <hr class="border-t border-custom my-4">
+                <div id="navSettings" onclick="showPage('settings')" class="text-secondary hover:text-primary p-3 rounded-xl transition cursor-pointer">
+                    <span data-ar="الإعدادات" data-en="Settings">الإعدادات</span>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-10 pb-24 md:pb-10 overflow-y-auto w-full">
+
+            <!-- HOME PAGE -->
+            <div id="pageHome">
+                <header class="mb-8">
+                    <h1 class="text-3xl md:text-4xl font-extrabold mb-2">
+                        <span data-ar="جاهز لإنجاز جديد" data-en="Ready for achievement">جاهز لإنجاز جديد</span>
+                        <span class="text-[#E30613]" data-ar="النهاردة؟" data-en="today?">النهاردة؟</span>
+                    </h1>
+                    <p id="dailyQuote" class="daily-quote"></p>
+                </header>
+
+                <!-- STATS CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="stat-card card-load-line relative overflow-hidden p-6 rounded-2xl border border-custom border-t-4 border-t-[#E30613] shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-[#E30613]/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-[#E30613]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-right">
+                                <p id="statLecDone" class="text-3xl font-black text-primary">0</p>
+                                <p id="statLecTotal" class="text-xs text-tertiary mt-1">من 0 محاضرة</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-secondary font-semibold" data-ar="محاضرات مكتملة" data-en="Completed Lectures">محاضرات مكتملة</p>
+                    </div>
+
+                    <div class="stat-card card-load-line relative overflow-hidden p-6 rounded-2xl border border-custom border-t-4 border-t-[#E30613] shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-[#E30613]/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-[#E30613]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <div class="text-right">
+                                <p id="statSubAvg" class="text-3xl font-black text-primary">0%</p>
+                                <p class="text-xs text-tertiary mt-1" data-ar="متوسط التقدم" data-en="Average Progress">متوسط التقدم</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-secondary font-semibold" data-ar="تقدم المواد" data-en="Subjects Progress">تقدم المواد</p>
+                    </div>
+
+                    <div class="stat-card card-load-line relative overflow-hidden p-6 rounded-2xl border border-custom border-t-4 border-t-[#E30613] shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-[#E30613]/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-[#E30613]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-right">
+                                <p id="statCrsAvg" class="text-3xl font-black text-primary">0%</p>
+                                <p class="text-xs text-tertiary mt-1" data-ar="متوسط التقدم" data-en="Average Progress">متوسط التقدم</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-secondary font-semibold" data-ar="تقدم الكورسات" data-en="Courses Progress">تقدم الكورسات</p>
+                    </div>
+                </div>
+
+                <!-- SUBJECTS OVERVIEW -->
+                <div class="mb-10">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-primary" data-ar="مواد الكلية" data-en="College Subjects">مواد الكلية</h2>
+                        <button onclick="showPage('subjects')" class="text-sm text-[#E30613] hover:text-[#c30510] transition font-semibold" data-ar="عرض الكل ←" data-en="View All →">عرض الكل ←</button>
+                    </div>
+                    <div id="homeSubjects" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- COURSES OVERVIEW -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-primary" data-ar="تتبع الكورسات" data-en="Course Tracking">تتبع الكورسات</h2>
+                        <button onclick="showPage('courses')" class="text-sm text-[#E30613] hover:text-[#c30510] transition font-semibold" data-ar="عرض الكل ←" data-en="View All →">عرض الكل ←</button>
+                    </div>
+                    <div id="homeCourses" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- DIARY PAGE -->
+            <div id="pageDiary" class="hidden">
+                <header class="mb-12">
+                    <h1 class="text-4xl font-extrabold">
+                        <span class="text-primary" data-ar="اليوميات" data-en="Daily Log">اليوميات</span>
+                    </h1>
+                </header>
+
+                <div class="bg-secondary p-6 rounded-2xl border-t-4 border-[#E30613] max-w-2xl mb-10">
+                    <h3 class="text-[#E30613] font-bold text-xl mb-4 border-b border-custom pb-2" data-ar="سجل إنجاز جديد" data-en="Log New Achievement">سجل إنجاز جديد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="text-xs text-tertiary block mb-1" data-ar="النوع" data-en="Type">النوع</label>
+                            <select id="entryType" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:outline-none focus:border-[#E30613] transition">
+                                <option value="subject" class="bg-secondary" data-ar="مادة كلية" data-en="College Subject">مادة كلية</option>
+                                <option value="course" class="bg-secondary" data-ar="كورس خارجي" data-en="External Course">كورس خارجي</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-tertiary block mb-1" data-ar="اسم المادة / الكورس" data-en="Subject/Course Name">اسم المادة / الكورس</label>
+                            <input id="entrySubject" type="text" placeholder="مثال: هندسة البرمجيات"
+                            class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-xs text-tertiary block mb-1" data-ar="عملت إيه النهارده؟" data-en="What did you do today?">عملت إيه النهارده؟</label>
+                        <input id="entryDone" type="text" placeholder="مثال: حليت 5 أسئلة على الـ Trees"
+                        class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-xs text-tertiary block mb-1" data-ar="لسه إيه اللي باقي؟" data-en="What's remaining?">لسه إيه اللي باقي؟</label>
+                        <input id="entryRemaining" type="text" placeholder="مثال: لسه Chapter 4 و 5"
+                        class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                    </div>
+                    <div class="mb-6">
+                        <label class="text-xs text-tertiary block mb-1" data-ar="ملاحظات إضافية (اختياري)" data-en="Additional Notes (Optional)">ملاحظات إضافية (اختياري)</label>
+                        <textarea id="entryNotes" placeholder="أي حاجة تانية عايز تسجلها..."
+                        class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary resize-y" rows="3"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="saveEntry()" class="bg-[#E30613] text-white px-6 py-2 rounded-lg hover:bg-[#c30510] transition-all" data-ar="حفظ الإنجاز" data-en="Save Achievement">حفظ الإنجاز</button>
+                    </div>
+                </div>
+
+                <div class="max-w-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-xs text-tertiary tracking-widest" data-ar="السجلات السابقة" data-en="Previous Logs">السجلات السابقة</p>
+                        <button onclick="clearAllEntries()" class="text-xs text-secondary hover:text-[#E30613] transition font-bold hidden" id="clearAllBtn" data-ar="مسح الكل" data-en="Clear All">مسح الكل</button>
+                    </div>
+                    <div id="entriesList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- ATHKAR PAGE (ENHANCED) -->
+            <div id="pageAthkar" class="hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-extrabold">
+                        <span class="text-primary" data-ar="الأذكار والورد" data-en="Athkar & Wird">الأذكار والورد</span>
+                    </h1>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-6xl mb-8">
+                    <!-- Prayer Times (Left) -->
+                    <div id="prayerTimesCard" class="bg-secondary p-5 rounded-xl border-t-4 border-[#E30613] shadow-lg h-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-primary font-bold text-lg flex items-center gap-2">
+                                <span class="text-xl">🕌</span>
+                                <span data-ar="مواقيت الصلاة" data-en="Prayer Times">مواقيت الصلاة</span>
+                            </h3>
+                            <div id="prayerLocation" class="text-xs text-tertiary"></div>
+                        </div>
+                        <div id="nextPrayerTimer" class="text-center text-sm font-bold text-[#E30613] bg-[#E30613]/5 py-2 rounded-lg mb-4 hidden border border-[#E30613]/10"></div>
+                        <div id="prayerTimesList" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
+                            <!-- Prayer times will be injected here by JS -->
+                            <div class="text-tertiary text-sm" data-ar="جاري التحميل..." data-en="Loading...">جاري التحميل...</div>
+                        </div>
+                    </div>
+
+                    <!-- Quran Wird & Athkar Checkboxes (Right) -->
+                    <div class="bg-secondary p-5 rounded-xl border-t-4 border-[#E30613] shadow-lg flex flex-col justify-between h-full">
+                        <div>
+                            <h3 class="text-primary font-bold text-lg mb-3 flex items-center gap-2">
+                                <span class="text-xl">📖</span>
+                                <span data-ar="الورد اليومي" data-en="Daily Wird">الورد اليومي</span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+                                <div class="md:col-span-3">
+                                    <label class="text-xs text-tertiary block mb-1" data-ar="اسم السورة" data-en="Surah Name">اسم السورة</label>
+                                    <input type="text" id="quranSurahInput" class="w-full bg-tertiary border border-custom rounded-lg p-2.5 text-sm text-primary focus:outline-none focus:border-[#E30613] placeholder:text-tertiary" placeholder="الفاتحة">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="text-xs text-tertiary block mb-1" data-ar="رقم الصفحة" data-en="Page Number">رقم الصفحة</label>
+                                    <input type="number" id="quranPageInput" class="w-full bg-tertiary border border-custom rounded-lg p-2.5 text-sm text-primary focus:outline-none focus:border-[#E30613] font-semibold placeholder:text-tertiary" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="w-full bg-tertiary h-1.5 rounded-full overflow-hidden mb-2">
+                                <div id="wirdProgressBar" class="bg-[#E30613] h-full transition-all duration-500" style="width:0%"></div>
+                            </div>
+                            <div id="wirdStats" class="text-xs text-tertiary text-center mb-4"></div>
+                            <div class="flex justify-end mb-4">
+                                <button onclick="saveWirdData()" class="bg-[#E30613] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#c30510] transition text-sm">
+                                    <span data-ar="حفظ الورد" data-en="Save Wird">حفظ الورد</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Athkar Tracker (Moved Here) -->
+                        <div class="pt-4 border-t border-custom">
+                            <h3 class="text-primary font-bold text-sm mb-3" data-ar="متابعة الأذكار" data-en="Athkar Tracker">متابعة الأذكار</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="flex items-center gap-2 bg-tertiary px-3 py-2 rounded-lg cursor-pointer hover:bg-tertiary/80 transition flex-1 justify-center border border-custom">
+                                    <input type="checkbox" id="chkMorning" onchange="saveDailyAthkarStatus()" class="w-4 h-4 accent-[#E30613] rounded focus:ring-0 cursor-pointer">
+                                    <span class="text-sm font-bold text-primary" data-ar="الصباح" data-en="Morning">الصباح</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-tertiary px-3 py-2 rounded-lg cursor-pointer hover:bg-tertiary/80 transition flex-1 justify-center border border-custom">
+                                    <input type="checkbox" id="chkEvening" onchange="saveDailyAthkarStatus()" class="w-4 h-4 accent-[#E30613] rounded focus:ring-0 cursor-pointer">
+                                    <span class="text-sm font-bold text-primary" data-ar="المساء" data-en="Evening">المساء</span>
+                                </label>
+                                <label class="flex items-center gap-2 bg-tertiary px-3 py-2 rounded-lg cursor-pointer hover:bg-tertiary/80 transition flex-1 justify-center border border-custom">
+                                    <input type="checkbox" id="chkSleep" onchange="saveDailyAthkarStatus()" class="w-4 h-4 accent-[#E30613] rounded focus:ring-0 cursor-pointer">
+                                    <span class="text-sm font-bold text-primary" data-ar="النوم" data-en="Sleep">النوم</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Athkar Accordions (Bottom) -->
+                <div id="athkarContainer" class="space-y-3 max-w-6xl mx-auto"></div>
+            </div>
+
+            <!-- SUBJECTS PAGE -->
+            <div id="pageSubjects" class="hidden">
+                <header class="mb-12">
+                    <h1 class="text-4xl font-extrabold">
+                        <span class="text-primary" data-ar="مواد الكلية" data-en="College Subjects">مواد الكلية</span>
+                    </h1>
+                </header>
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <div id="subjectsList" class="xl:col-span-2 space-y-4"></div>
+                    <div class="xl:col-span-1">
+                        <div id="subjectsCalendar" class="bg-secondary p-6 rounded-2xl border-t-4 border-[#E30613] sticky top-6"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COURSES PAGE -->
+            <div id="pageCourses" class="hidden">
+                <header class="mb-12">
+                    <h1 class="text-4xl font-extrabold">
+                        <span class="text-primary" data-ar="تتبع الكورسات" data-en="Course Tracking">تتبع الكورسات</span>
+                    </h1>
+                </header>
+                <div id="coursesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl"></div>
+            </div>
+
+            <!-- SCHEDULE PAGE -->
+            <div id="pageSchedule" class="hidden">
+                <header class="mb-12">
+                    <h1 class="text-4xl font-extrabold">
+                        <span class="text-primary" data-ar="الجدول الدراسي" data-en="Schedule">الجدول الدراسي</span>
+                    </h1>
+                </header>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button onclick="setScheduleFilter('all')" id="filter-all" class="px-5 py-2 rounded-xl font-bold text-sm transition bg-[#E30613] text-white shadow-lg shadow-[#E30613]/20" data-ar="الكل" data-en="All">الكل</button>
+                    <button onclick="setScheduleFilter('exams')" id="filter-exams" class="px-5 py-2 rounded-xl font-bold text-sm transition bg-tertiary text-secondary hover:text-primary" data-ar="الامتحانات" data-en="Exams">الامتحانات</button>
+                    <button onclick="setScheduleFilter('lectures')" id="filter-lectures" class="px-5 py-2 rounded-xl font-bold text-sm transition bg-tertiary text-secondary hover:text-primary" data-ar="محاضرات وسكاشن" data-en="Lectures & Sections">محاضرات وسكاشن</button>
+                </div>
+
+                <!-- Add New Item Form -->
+                <div class="bg-secondary p-6 rounded-2xl border-t-4 border-[#E30613] mb-8 shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="schFormTitle" class="text-primary font-bold text-lg" data-ar="إضافة موعد جديد" data-en="Add New Event">إضافة موعد جديد</h3>
+                        <button id="schCancelBtn" onclick="resetScheduleForm()" class="hidden text-xs text-[#E30613] hover:underline font-bold" data-ar="إلغاء التعديل" data-en="Cancel Edit">إلغاء التعديل</button>
+                    </div>
+
+                    <input type="hidden" id="schId">
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-tertiary block mb-1" data-ar="النوع" data-en="Type">النوع</label>
+                            <select id="schType" onchange="toggleScheduleInputs()" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition">
+                                <option value="exam" data-ar="امتحان " data-en="Exam ">امتحان </option>
+                                <option value="deadline" data-ar="تسليم مشروع " data-en="Deadline ">تسليم مشروع </option>
+                                <option value="section" data-ar="سكشن " data-en="Section ">سكشن </option>
+                                <option value="lecture" data-ar="محاضرة " data-en="Lecture ">محاضرة </option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-4">
+                            <label class="text-xs text-tertiary block mb-1" data-ar="الاسم" data-en="Name">الاسم</label>
+                            <input id="schName" type="text" placeholder="" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                        </div>
+                        <!-- Date Input (For Exams/Deadlines) -->
+                        <div id="schDateGroup" class="md:col-span-3">
+                            <label class="text-xs text-tertiary block mb-1" data-ar="التاريخ" data-en="Date">التاريخ</label>
+                            <input id="schDate" type="date" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition [color-scheme:dark]">
+                        </div>
+                        <!-- Day Select (For Lectures/Sections) -->
+                        <div id="schDayGroup" class="md:col-span-3 hidden">
+                            <label class="text-xs text-tertiary block mb-1" data-ar="اليوم" data-en="Day">اليوم</label>
+                            <select id="schDay" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition"></select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-tertiary block mb-1" data-ar="الساعة" data-en="Time">الساعة</label>
+                            <input id="schTime" type="time" class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition [color-scheme:dark]">
+                        </div>
+                        <div class="md:col-span-1">
+                            <button id="schBtn" onclick="handleScheduleSubmit()" class="w-full bg-[#E30613] hover:bg-[#c30510] text-white p-3 rounded-lg font-bold transition flex items-center justify-center">
+                                <span data-ar="إضافة" data-en="Add">إضافة</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule List/Table -->
+                <div class="bg-secondary rounded-2xl border border-custom overflow-hidden shadow-lg">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-center">
+                            <tbody id="scheduleList" class="divide-y divide-[rgba(255,255,255,0.05)]">
+                                <!-- Items will be here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS PAGE -->
+            <div id="pageSettings" class="hidden">
+                <header class="mb-12">
+                    <h1 class="text-3xl md:text-4xl font-extrabold flex-wrap">
+                        <span class="text-primary" data-ar="الإعدادات" data-en="Settings">الإعدادات</span>
+                    </h1>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl">
+
+                    <!-- SUBJECTS SETTINGS -->
+                    <div class="bg-secondary p-6 rounded-2xl border-t-4 border-[#E30613]">
+                        <h3 class="text-primary font-bold text-lg mb-4 pb-2 border-b border-custom flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#E30613]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <span data-ar="مواد الكلية" data-en="College Subjects">مواد الكلية</span>
+                        </h3>
+                        <div id="settingsSubjectsList" class="space-y-2 mb-4 max-h-60 overflow-y-auto"></div>
+                        <div class="space-y-2 mt-4">
+                            <input id="newSubjectName" type="text" placeholder="اسم المادة"
+                                class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                            <div class="flex gap-2">
+                                <input id="newSubjectLectures" type="number" placeholder="عدد المحاضرات" min="1" max="50" value="12"
+                                    class="flex-1 bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                                <button onclick="addSubject()" class="bg-[#E30613] hover:bg-[#c30510] text-white px-6 py-3 rounded-lg text-sm font-bold transition shrink-0" data-ar="إضافة" data-en="Add">إضافة</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COURSES SETTINGS -->
+                    <div class="bg-secondary p-6 rounded-2xl border-t-4 border-[#E30613]">
+                        <h3 class="text-primary font-bold text-lg mb-4 pb-2 border-b border-custom flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#E30613]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <span data-ar="الكورسات" data-en="Courses">الكورسات</span>
+                        </h3>
+                        <div id="settingsCoursesList" class="space-y-2 mb-4 max-h-60 overflow-y-auto"></div>
+                        <div class="space-y-2 mt-4">
+                            <input id="newCourseName" type="text" placeholder="اسم الكورس"
+                                class="w-full bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                            <div class="flex gap-2">
+                                <input id="newCourseVideos" type="number" placeholder="عدد الفيديوهات" min="1" max="500" value="50"
+                                    class="flex-1 bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                                <button onclick="addCourse()" class="bg-[#E30613] hover:bg-[#c30510] text-white px-6 py-3 rounded-lg text-sm font-bold transition shrink-0" data-ar="إضافة" data-en="Add">إضافة</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PRAYER SETTINGS -->
+                    <div class="bg-secondary p-6 rounded-2xl border-t-4 border-[#E30613]">
+                        <h3 class="text-primary font-bold text-lg mb-4 pb-2 border-b border-custom flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#E30613]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span data-ar="إعدادات مواقيت الصلاة" data-en="Prayer Time Settings">إعدادات مواقيت الصلاة</span>
+                        </h3>
+                        <div class="space-y-2 mt-4">
+                            <p class="text-xs text-tertiary mb-2" data-ar="اكتب اسم بلدك ومدينتك باللغة الإنجليزية للحصول على مواقيت دقيقة." data-en="Enter your country and city in English for accurate timings.">اكتب اسم بلدك ومدينتك باللغة الإنجليزية للحصول على مواقيت دقيقة.</p>
+                            <div class="flex gap-2">
+                                <input id="prayerCountry" type="text" placeholder="Country (e.g. Egypt)"
+                                    class="flex-1 bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                                <input id="prayerCity" type="text" placeholder="City (e.g. Cairo)"
+                                    class="flex-1 bg-tertiary border border-custom rounded-lg p-3 text-primary text-sm focus:outline-none focus:border-[#E30613] transition placeholder:text-tertiary">
+                            </div>
+                             <div class="flex justify-end pt-2">
+                                <button onclick="savePrayerSettings()" class="bg-[#E30613] hover:bg-[#c30510] text-white px-6 py-3 rounded-lg text-sm font-bold transition shrink-0" data-ar="حفظ" data-en="Save">حفظ</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 md:left-5 md:translate-x-0 flex flex-col gap-2 z-50"></div>
+
+    <!-- ADHKAR MODAL -->
+    <div id="adhkarModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div onclick="closeAdhkarModal()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="relative bg-secondary w-full max-w-2xl max-h-[80vh] rounded-2xl border border-custom shadow-2xl flex flex-col">
+            <header class="p-4 border-b border-custom flex justify-between items-center shrink-0">
+                <h3 id="adhkarModalTitle" class="text-lg font-bold text-primary"></h3>
+                <button onclick="closeAdhkarModal()" class="text-tertiary hover:text-[#E30613] transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </header>
+            <div id="adhkarModalContent" class="p-6 overflow-y-auto space-y-4">
+                <!-- Adhkar will be injected here -->
+            </div>
+            <footer class="p-4 border-t border-custom shrink-0 text-center">
+                <button onclick="closeAdhkarModal()" class="bg-[#E30613] text-white px-8 py-2 rounded-lg font-bold hover:bg-[#c30510] transition" data-ar="إغلاق" data-en="Close">إغلاق</button>
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

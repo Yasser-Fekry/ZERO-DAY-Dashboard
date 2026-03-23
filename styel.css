@@ -1,0 +1,240 @@
+    /* CSS Variables for Theme */
+    :root {
+        --bg-primary: #121212;
+        --bg-secondary: #1a1a1a;
+        --bg-tertiary: #0f0f0f;
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0a0;
+        --text-tertiary: #666666;
+        --border-color: rgba(255, 255, 255, 0.05);
+        --accent-color: #E30613;
+        --accent-hover: #c30510;
+        --card-shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="light"] {
+        --bg-primary: #f5f5f5;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #fafafa;
+        --text-primary: #1a1a1a;
+        --text-secondary: #4a4a4a;
+        --text-tertiary: #888888;
+        --border-color: rgba(0, 0, 0, 0.1);
+        --accent-color: #E30613;
+        --accent-hover: #c30510;
+        --card-shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        height: 100vh;
+        height: 100dvh;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .bg-primary { background-color: var(--bg-primary); }
+    .bg-secondary { background-color: var(--bg-secondary); }
+    .bg-tertiary { background-color: var(--bg-tertiary); }
+    .text-primary { color: var(--text-primary); }
+    .text-secondary { color: var(--text-secondary); }
+    .text-tertiary { color: var(--text-tertiary); }
+    .border-custom { border-color: var(--border-color); }
+
+    .lectures-panel {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+    }
+    .lectures-panel.open {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    .arrow {
+        transition: transform 0.3s ease;
+        display: inline-block;
+    }
+    .arrow.open {
+        transform: rotate(180deg);
+    }
+    .motivational-quote-pro {
+    position: relative;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-top: 2px solid #ef4444;
+    color: #d1d5db;
+    padding: 18px 24px;
+    border-radius: 12px;
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    text-align: center;
+    direction: rtl;
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/*--------------*/
+.daily-quote {
+    position: relative;
+    padding: 8px 16px 8px 0;
+    border-right: 3px solid #ef4444; /* Default for Arabic */
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: right;
+    direction: rtl;
+    margin: 8px 0;
+    color: #ffffff; /* Default white for dark mode */
+    opacity: 0.85;
+    transition: all 0.3s ease;
+    display: inline-block;
+    max-width: 100%;
+}
+
+/* Light mode - black text */
+.light .daily-quote,
+body.light .daily-quote,
+html.light .daily-quote {
+    color: #000000 !important;
+}
+
+/* If light mode is default and dark is a class */
+body:not(.dark):not([data-theme="dark"]) .daily-quote {
+    color: #000000;
+}
+
+/* Data attribute method */
+[data-theme="light"] .daily-quote {
+    color: #000000 !important;
+}
+
+[data-theme="dark"] .daily-quote {
+    color: #ffffff !important;
+}
+
+/* Hover effect - adjust for both languages */
+.daily-quote:hover {
+    opacity: 1;
+}
+
+/* Arabic hover */
+.daily-quote[style*="border-right"]:hover {
+    border-right-width: 4px !important;
+    padding-right: 18px !important;
+}
+
+/* English hover */
+.daily-quote[style*="border-left"]:hover {
+    border-left-width: 4px !important;
+    padding-left: 18px !important;
+}
+
+/* Transition for text change */
+.daily-quote.fade-out {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.daily-quote.fade-in {
+    opacity: 0.85;
+    transform: translateX(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .daily-quote {
+        font-size: 13px;
+        padding: 6px 12px 6px 0;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+    .daily-quote {
+        font-size: 12px;
+    }
+}
+
+    /* Theme Toggle */
+    .theme-toggle {
+        position: relative;
+        width: 60px;
+        height: 28px;
+        background: rgba(128, 128, 128, 0.2);
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .theme-toggle-slider {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        top: 2px;
+        right: 2px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        /* justify-center: center; */
+        font-size: 12px;
+    }
+    .theme-toggle.light .theme-toggle-slider {
+        right: 34px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #ff0716 0%, var(--accent-color) 100%);
+        box-shadow: 0 0 10px rgba(227, 6, 19, 0.5);
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent-color) var(--bg-tertiary);
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Card Styles */
+    .stat-card {
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px var(--card-shadow);
+    }
+
+    /* Priority Buttons */
+    .priority-btn-group .priority-btn {
+        transition: all 0.2s ease;
+    }
+    .priority-btn-group .priority-btn.active {
+        background-color: var(--accent-color);
+        color: white;
+        box-shadow: 0 2px 10px rgba(227, 6, 19, 0.3);
+    }

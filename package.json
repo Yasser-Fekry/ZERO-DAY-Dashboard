@@ -1,0 +1,43 @@
+{
+  "name": "zero_day",
+  "version": "1.0.0",
+  "description": "Zero Day Dashboard Application",
+  "author": "Yasser Fekry",
+  "main": "main.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+    "start": "npm run build:css && electron .",
+    "build": "npm run build:css && electron-builder --win",
+    "build:dir": "npm run build:css && electron-builder --dir"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.zero.day",
+    "productName": "Zero-Day-Dashboard",
+    "directories": {
+      "output": "release"
+    },
+"files": [
+  "main.js",
+  "index.html",
+  "script.js",
+  "styel.css",
+  "dist/output.css",
+  "assets/**/*",
+  "!src/**/*"
+],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/day.ico"
+    }
+  }
+}
